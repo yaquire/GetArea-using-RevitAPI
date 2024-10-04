@@ -33,12 +33,31 @@ namespace ElementID
                     ElementId eleID = pickObj.ElementId;
                     Element ele = doc.GetElement(eleID);
                     Parameter areaParam = ele.LookupParameter("Area");
+                    List<object> items = new List<object>();
 
                     //This line gets the area of the selected item to 3dp
                     double area = areaParam.AsDouble();
                     area = UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters); //Converts to square meters no whether if sf or m2
 
                     TaskDialog.Show("Area: ", area.ToString("F2", CultureInfo.InvariantCulture) + "_m2");
+
+                    //Access the xlsx file, there is no imput, it is static
+                    using (var workbook = new XLWorkbook("C:\\Users\\yaqub\\Desktop\\ETTV-Calculation EDITED (1).xlsx"))
+                    {
+                        //access the Cover Page sheet
+                        var worksheet = workbook.Worksheet("CoverPage");
+                        //Set Range at t1-t100
+                        var range = worksheet.Range("T1:T100");
+                        //Retrives data from each cell
+                        foreach (var cell in range.Cells())
+                        {
+                            var value = cell.Value;
+                            items.Add(value);
+
+                            //Console.WriteLine($"Cell {cell.Address}: {value} ");
+                        }
+                        TaskDialog.Show("From Excel", items.ToString());
+                    }
                 }
                 return Result.Succeeded;
 
