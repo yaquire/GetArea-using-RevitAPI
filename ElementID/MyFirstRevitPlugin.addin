@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>Hollo werld</Name>
+		<FullClassName>ElementID.Class1</FullClassName>
+		<Text> Hello World</Text>
+		<Description> Hello World Description</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>
+			ElementID.dll
+		</Assembly>
+		<AddInId>4A65483E-430E-43FE-A869-6745DF75C465</AddInId>
+		<VendorId>www.aec-tech.net</VendorId>
+		<VendorDescription>www.aec-tech.net</VendorDescription>
+	</AddIn>
+	<AddIn Type="Command">
+		<Name>Change Locations </Name>
+		<FullClassName>ElementID.ChangeLocation</FullClassName>
+		<Text>ChangeLocation</Text>
+		<Description>Changes the location of selected item </Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>
+			ElementID.dll
+		</Assembly>
+		<AddInId>78D0454C-77C8-498F-B70A-3FE6C984075B</AddInId>
+		<VendorId>yaq</VendorId>
+		<VendorDescription>yaquber</VendorDescription>
+	</AddIn>
+	<AddIn Type="Command">
+		<Name>Get Wall Area</Name>
+		<FullClassName>ElementID.GetWallArea</FullClassName>
+		<Text>GetWallArea</Text>
+		<Description>Gets wall area adds to a xlx file </Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>
+			ElementID.dll
+		</Assembly>
+		<AddInId>78D0454C-77C8-498F-B70A-3FE6C984076B</AddInId>
+		<VendorId>yaq</VendorId>
+		<VendorDescription>yaquber</VendorDescription>
+	</AddIn>
+</RevitAddIns>
