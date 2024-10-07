@@ -27,10 +27,10 @@ namespace ElementID
             //get UIdoc & doc
             UIDocument uiDoc = commandData.Application.ActiveUIDocument;
             Autodesk.Revit.DB.Document doc = uiDoc.Document;
-            TaskDialog.Show("To use", "Select Item it Will be added to a file");
+            //TaskDialog.Show("To use", "Select Item it Will be added to a file");
             try
             {
-
+                List<List<string>> excelData = new List<List<string>>();
                 Reference pickObj = uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element);
                 if (pickObj != null)
                 {
@@ -40,16 +40,23 @@ namespace ElementID
                     Parameter areaParam = ele.LookupParameter("Area");
                     List<object> items = new List<object>();
 
+                    List<string> rowData = new List<string> ();
                     //This line gets the area of the selected item to 3dp
                     double area = areaParam.AsDouble();
                     area = UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters); //Converts to square meters no whether if sf or m2
+                    rowData.Add("NIL");
+                    rowData.Add(ele.Name.ToString());
+                    rowData.Add(area.ToString());
 
+
+                    excelData.Add(rowData);
                     TaskDialog.Show("Area: ", area.ToString("F2", CultureInfo.InvariantCulture) + "_m2");
                 }
+                
                 string filePath = @"C:\Users\yaqub\Desktop\ETTV-Calculation EDITED (1).xlsx";
-                Excel_Read readExcel = new Excel_Read();
-                List<List<string>> data = readExcel.ReadExcel(filePath);
-                Console.WriteLine(data.Count());                    
+                Write_Excel writeExcel = new Write_Excel();
+                writeExcel.writeExcel(excelData,filePath);
+                TaskDialog.Show("Test Case", "Done");                    
                 
                 
                 return Result.Succeeded;
@@ -61,9 +68,6 @@ namespace ElementID
                 message = err.Message;
                 return Result.Failed;
             }
-        }
-
-
-        
+        }  
     }
 }
