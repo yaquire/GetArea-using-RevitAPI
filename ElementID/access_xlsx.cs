@@ -1,29 +1,45 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using ClosedXML.Excel;
-using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.IO; // Add this line
+using OfficeOpenXml;
+using DocumentFormat.OpenXml.Wordprocessing;
 
-namespace ElementID
+namespace Excel_Lib
 {
-    internal class access_xlsx
+    public class Excel_Read
     {
-        static void main()
+        public  List<List<string>> ReadExcel(string filepath)
         {
-            //Access the xlsx file, there is no imput, it is static
-            using (var workbook = new XLWorkbook("C:\\Users\\yaqub\\Desktop\\ETTV-Calculation EDITED (1).xlsx"))
+            var excelData = new List<List<string>>();
+
+            // Ensure EPPlus is set to non-commercial mode (if necessary)
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            //ensure the file exsists
+            if (!File.Exists(filepath))
             {
-                //access the Cover Page sheet
-                var worksheet = workbook.Worksheet("CoverPage");
-                //Set Range at t1-t100
-                var range = worksheet.Range("T1;T100");
-                //Retrives data from each cell
-                foreach (var cell in range.Cells()) {
-                    var value = cell.Value;
-                    Console.WriteLine($"Cell {cell.Address}: {value} ");
+                Console.WriteLine("File not Found");
+                return excelData;
+            }
+            using (ExcelPackage package = new ExcelPackage(filepath))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[0]; // Get the first worksheet
+
+                for (int row = 20; row <= 22; row++)
+                {
+                    List<String> col_List = new List<String>();
+
+                    for (int col = 1; col <= 100; col++)
+                    {
+                        string cellValue = worksheet.Cells[row, col].Text;
+                        col_List.Add(cellValue);
+                    }
+                    excelData.Add(col_List);
                 }
             }
+            return excelData;
         }
     }
 }

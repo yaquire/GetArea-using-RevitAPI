@@ -2,15 +2,20 @@
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using ClosedXML;
+
 //For Excel
-using ClosedXML.Excel;
+using Excel_Lib;
+
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Diagnostics; // Required for Process
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace ElementID
 {
@@ -21,7 +26,7 @@ namespace ElementID
         {
             //get UIdoc & doc
             UIDocument uiDoc = commandData.Application.ActiveUIDocument;
-            Document doc  = uiDoc.Document;
+            Autodesk.Revit.DB.Document doc = uiDoc.Document;
             TaskDialog.Show("To use", "Select Item it Will be added to a file");
             try
             {
@@ -40,25 +45,13 @@ namespace ElementID
                     area = UnitUtils.ConvertFromInternalUnits(area, UnitTypeId.SquareMeters); //Converts to square meters no whether if sf or m2
 
                     TaskDialog.Show("Area: ", area.ToString("F2", CultureInfo.InvariantCulture) + "_m2");
-
-                    //Access the xlsx file, there is no imput, it is static
-                    using (var workbook = new XLWorkbook("C:\\Users\\yaqub\\Desktop\\ETTV-Calculation EDITED (1).xlsx"))
-                    {
-                        //access the Cover Page sheet
-                        var worksheet = workbook.Worksheet("CoverPage");
-                        //Set Range at t1-t100
-                        var range = worksheet.Range("T1:T100");
-                        //Retrives data from each cell
-                        foreach (var cell in range.Cells())
-                        {
-                            var value = cell.Value;
-                            items.Add(value);
-
-                            //Console.WriteLine($"Cell {cell.Address}: {value} ");
-                        }
-                        TaskDialog.Show("From Excel", items.ToString());
-                    }
                 }
+                string filePath = @"C:\Users\yaqub\Desktop\ETTV-Calculation EDITED (1).xlsx";
+                Excel_Read readExcel = new Excel_Read();
+                List<List<string>> data = readExcel.ReadExcel(filePath);
+                Console.WriteLine(data.Count());                    
+                
+                
                 return Result.Succeeded;
 
 
@@ -69,5 +62,8 @@ namespace ElementID
                 return Result.Failed;
             }
         }
+
+
+        
     }
 }
