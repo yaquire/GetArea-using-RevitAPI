@@ -1,4 +1,6 @@
-﻿using OfficeOpenXml;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 
@@ -7,7 +9,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.IO.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
+using System.Linq;
 
 namespace Excel_Lib
 {
@@ -18,7 +20,7 @@ namespace Excel_Lib
             var excelData = new List<List<string>>();
 
             // Ensure EPPlus is set to non-commercial mode (if necessary)
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;  
             //ensure the file exsists
             if (!File.Exists(filepath))
             {
@@ -53,30 +55,50 @@ namespace Excel_Lib
             }
             // Ensure EPPlus is set to non-commercial mode (if necessary)
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (ExcelPackage package = new ExcelPackage(filepath))
+            // Open the existing Excel file
+            using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(filepath, true))
             {
-                ExcelWorksheet worksheet = package.Workbook.Worksheets[1]; // Get the first worksheet
-                for (int col = 20; col <= 22; col++) {
-                    for (int row = 1;row <= 10; row++)
-                    {
-                        //TaskDialog.Show("Col Number: Row Number", col.ToString()+":"+row.ToString());
-                        try
-                        {
-                            worksheet.Cells[row, col].Value = excelData[0][row];
-                            FileInfo fileInfo = new FileInfo(filepath);
-                            package.SaveAs(fileInfo);
-                        }
-                        catch (Exception err)
-                        {
-                            break;
-                        }
-                        // Save the Excel package to a file
-                        
-                    }
-                }
-                
-            }
+                // Get the workbook part
+                WorkbookPart workbookPart = spreadsheetDocument.WorkbookPart;
 
+                // Get the first worksheet (or select the desired one if multiple sheets exist)
+                Sheet sheet = workbookPart.Workbook.Descendants<Sheet>().FirstOrDefault();
+                if (sheet == null)
+                {
+                    TaskDialog.Show("Excel","No sheet found.");
+                    return;
+                }
+                // Get the associated worksheet part
+                WorksheetPart worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
+                // Get the SheetData where rows and cells are stored
+                SheetData sheetData = worksheetPart.Worksheet.GetFirstChild<SheetData>();
+
+                // Add a new row and cells with data to the existing sheet
+                Row row = new Row();
+                sheetData.Append(row);
+
+                row.Append(
+                    CreateTextCell("A3", "Jane Doe"),
+                    CreateTextCell("B3", "25"),
+                    CreateTextCell("C3", "Los Angeles"));
+
+                // Save changes to the worksheet
+                worksheetPart.Worksheet.Save();
+                TaskDialog.Show("Excel", "Written");
+            }
+        }
+
+        private static Cell CreateTextCell(string cellReference, string text)
+        {
+            return new Cell()
+            {
+                CellReference = cellReference,
+                DataType = CellValues.String,
+                CellValue = new CellValue(text)
+            };
         }
     }
 }
+    
+    
+
